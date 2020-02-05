@@ -164,7 +164,7 @@ function passEventToBrowser(browser: Browser, data: Event, ignoreNotFound: boole
 
 function callProcedure(name: string, args: any, info: ProcedureListenerInfo): Promise<any> {
     const listener = glob.__rpcListeners[name];
-    if(!listener) return util.promiseReject(ERR_NOT_FOUND);
+    if(!listener) return util.promiseReject(`${ERR_NOT_FOUND} (${name})`);
     return util.promiseResolve(listener(args, info));
 }
 
