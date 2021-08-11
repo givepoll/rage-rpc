@@ -42,8 +42,9 @@ export function getEnvironment(): string {
         if(mp.joaat) return 'server';
         else if(mp.game && mp.game.joaat) return 'client';
         else if(mp.trigger) return 'cef';
+        else return 'unknown';
     } catch(ex) {
-        
+        return 'unknown';
     }
 }
 

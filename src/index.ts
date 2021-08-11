@@ -20,6 +20,8 @@ if(!glob[PROCESS_EVENT_PARTIAL]){
     glob.__rpcPartialData = {};
 
     glob[PROCESS_EVENT_PARTIAL] = (player: Player | string | number, id: number, index: number, size: number | string, rawData?: string) => {
+        if(environment === "unknown") throw "Unknown RAGE environment";
+
         if(environment !== "server"){
             rawData = size as string;
             size = index as number;
@@ -48,6 +50,8 @@ if(!glob[PROCESS_EVENT]){
     glob.__rpcEvListeners = {};
 
     glob[PROCESS_EVENT] = (player: Player | string, rawData?: string) => {
+        if(environment === "unknown") throw "Unknown RAGE environment";
+
         if(environment !== "server") rawData = player as string;
         const data: Event = util.parseData(rawData);
 
@@ -95,7 +99,7 @@ if(!glob[PROCESS_EVENT]){
         }
     };
 
-    if(environment !== "cef"){
+    if(environment !== "cef" && environment !== "unknown"){
         mp.events.add(PROCESS_EVENT, glob[PROCESS_EVENT]);
         mp.events.add(PROCESS_EVENT_PARTIAL, glob[PROCESS_EVENT_PARTIAL]);
 
@@ -149,6 +153,8 @@ if(!glob[PROCESS_EVENT]){
             });
         }
     }else{
+        if(environment === "unknown") throw "Unknown RAGE environment";
+
         if(typeof glob[IDENTIFIER] === 'undefined'){
             glob[IDENTIFIER] = new Promise(resolve => {
                 if (window.name) {
@@ -200,6 +206,8 @@ function sendEventData(event: Event, player?: Player) {
  * @returns {Function} The function, which unregister the event.
  */
 export function register(name: string, cb: ProcedureListener): Function {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length !== 2) throw 'register expects 2 arguments: "name" and "cb"';
     if(environment === "cef") glob[IDENTIFIER].then((id: string) => mp.trigger(BROWSER_REGISTER, JSON.stringify([id, name])));
     glob.__rpcListeners[name] = cb;
@@ -212,6 +220,8 @@ export function register(name: string, cb: ProcedureListener): Function {
  * @param {string} name - The name of the procedure.
  */
 export function unregister(name: string): void {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length !== 1) throw 'unregister expects 1 argument: "name"';
     if(environment === "cef") glob[IDENTIFIER].then((id: string) => mp.trigger(BROWSER_UNREGISTER, JSON.stringify([id, name])));
     glob.__rpcListeners[name] = undefined;
@@ -228,6 +238,8 @@ export function unregister(name: string): void {
  * @returns The result from the procedure.
  */
 export function call(name: string, args?: any, options: CallOptions = {}): Promise<any> {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length < 1 || arguments.length > 3) return util.promiseReject('call expects 1 to 3 arguments: "name", optional "args", and optional "options"');
     return util.promiseTimeout(callProcedure(name, args, { environment }), options.timeout);
 }
@@ -273,6 +285,8 @@ function _callServer(name: string, args?: any, extraData: any = {}): Promise<any
  * @returns The result from the procedure.
  */
 export function callServer(name: string, args?: any, options: CallOptions = {}): Promise<any> {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length < 1 || arguments.length > 3) return util.promiseReject('callServer expects 1 to 3 arguments: "name", optional "args", and optional "options"');
 
     let extraData: any = {};
@@ -343,6 +357,8 @@ function _callClient(player: Player, name: string, args?: any, extraData: any = 
  * @returns The result from the procedure.
  */
 export function callClient(player: Player | string, name?: string | any, args?: any, options: CallOptions = {}): Promise<any> {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     switch(environment){
         case 'client': {
             options = args || {};
@@ -418,6 +434,8 @@ function _callBrowsers(player: Player, name: string, args?: any, extraData: any 
  * @returns The result from the procedure.
  */
 export function callBrowsers(player: Player | string, name?: string | any, args?: any, options: CallOptions = {}): Promise<any> {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     let promise;
     let extraData: any = {};
 
@@ -455,6 +473,8 @@ export function callBrowsers(player: Player | string, name?: string | any, args?
  * @returns The result from the procedure.
  */
 export function callBrowser(browser: Browser, name: string, args?: any, options: CallOptions = {}): Promise<any> {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(environment !== 'client') return util.promiseReject('callBrowser can only be used in the client environment');
     if(arguments.length < 2 || arguments.length > 4) return util.promiseReject('callBrowser expects 2 to 4 arguments: "browser", "name", optional "args", and optional "options"');
 
@@ -478,6 +498,8 @@ function callEvent(name: string, args: any, info: ProcedureListenerInfo){
  * @returns {Function} The function, which off the event.
  */
 export function on(name: string, cb: ProcedureListener): Function {
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length !== 2) throw 'on expects 2 arguments: "name" and "cb"';
 
     const listeners = glob.__rpcEvListeners[name] || new Set();
@@ -493,6 +515,8 @@ export function on(name: string, cb: ProcedureListener): Function {
  * @param cb - The callback for the event.
  */
 export function off(name: string, cb: ProcedureListener){
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length !== 2) throw 'off expects 2 arguments: "name" and "cb"';
 
     const listeners = glob.__rpcEvListeners[name];
@@ -510,6 +534,8 @@ export function off(name: string, cb: ProcedureListener){
  * @param args - Any parameters for the event.
  */
 export function trigger(name: string, args?: any){
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length < 1 || arguments.length > 2) throw 'trigger expects 1 or 2 arguments: "name", and optional "args"';
     callEvent(name, args, { environment });
 }
@@ -524,6 +550,8 @@ export function trigger(name: string, args?: any){
  * @param args - Any parameters for the event.
  */
 export function triggerClient(player: Player | string, name?: string | any, args?: any){
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     switch(environment){
         case 'client': {
             args = name;
@@ -557,6 +585,8 @@ export function triggerClient(player: Player | string, name?: string | any, args
  * @param args - Any parameters for the event.
  */
 export function triggerServer(name: string, args?: any){
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(arguments.length < 1 || arguments.length > 2) throw 'triggerServer expects 1 or 2 arguments: "name", and optional "args"';
 
     _callServer(TRIGGER_EVENT, [name, args], { noRet: 1 });
@@ -572,6 +602,8 @@ export function triggerServer(name: string, args?: any){
  * @param args - Any parameters for the event.
  */
 export function triggerBrowsers(player: Player | string, name?: string | any, args?: any){
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     switch(environment){
         case 'client':
         case 'cef':
@@ -598,6 +630,8 @@ export function triggerBrowsers(player: Player | string, name?: string | any, ar
  * @param args - Any parameters for the event.
  */
 export function triggerBrowser(browser: Browser, name: string, args?: any){
+    if(environment === "unknown") throw "Unknown RAGE environment";
+
     if(environment !== 'client') throw 'callBrowser can only be used in the client environment';
     if(arguments.length < 2 || arguments.length > 4) throw 'callBrowser expects 2 or 3 arguments: "browser", "name", and optional "args"';
 
