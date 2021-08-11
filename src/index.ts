@@ -137,8 +137,14 @@ if(!glob[PROCESS_EVENT]){
             });
 
             register(TRIGGER_EVENT_BROWSERS, ([name, args], info) => {
-                Object.values(glob.__rpcBrowsers).forEach(browser => {
-                    _callBrowser(browser, TRIGGER_EVENT, [name, args], { fenv: info.environment, noRet: 1 });
+                Object.keys(glob.__rpcBrowsers).forEach(key => {
+                    const browser = glob.__rpcBrowsers[key];
+                    if(!browser || !util.isBrowserValid(browser)) {
+                        // Clean up expired browsers
+                        delete glob.__rpcBrowsers[key];
+                    } else {
+                        _callBrowser(browser, TRIGGER_EVENT, [name, args], { fenv: info.environment, noRet: 1 });
+                    }
                 });
             });
         }
@@ -461,7 +467,7 @@ export function callBrowser(browser: Browser, name: string, args?: any, options:
 function callEvent(name: string, args: any, info: ProcedureListenerInfo){
     const listeners = glob.__rpcEvListeners[name];
     if(listeners){
-        listeners.forEach(listener => listener(args, info));
+        listeners.forEach((listener: any) => listener(args, info));
     }
 }
 
