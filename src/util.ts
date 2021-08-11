@@ -38,9 +38,13 @@ export function uid(): string {
 }
 
 export function getEnvironment(): string {
-    if(mp.joaat) return 'server';
-    else if(mp.game && mp.game.joaat) return 'client';
-    else if(mp.trigger) return 'cef';
+    try {
+        if(mp.joaat) return 'server';
+        else if(mp.game && mp.game.joaat) return 'client';
+        else if(mp.trigger) return 'cef';
+    } catch(ex) {
+        
+    }
 }
 
 export function stringifyData(data: any): string {
@@ -96,11 +100,11 @@ export function parseData(data: string): any {
 }
 
 export function promiseResolve(result: any): Promise<any> {
-    return new Promise(resolve => setTimeout(() => resolve(result), 0));
+    return new Promise(resolve => resolve(result));
 }
 
 export function promiseReject(error: any): Promise<any> {
-    return new Promise((_, reject) => setTimeout(() => reject(error), 0));
+    return new Promise((_, reject) => reject(error));
 }
 
 export function promiseTimeout(promise: Promise<any>, timeout?: number){
