@@ -170,7 +170,9 @@ if(!glob[PROCESS_EVENT]){
         }
     }
 
-    register(TRIGGER_EVENT, ([name, args], info) => callEvent(name, args, info));
+    if(environment !== "unknown") {
+        register(TRIGGER_EVENT, ([name, args], info) => callEvent(name, args, info));
+    }   
 }
 
 function passEventToBrowser(browser: Browser, data: Event, ignoreNotFound: boolean): void {
