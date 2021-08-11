@@ -20,7 +20,9 @@ if(!glob[PROCESS_EVENT_PARTIAL]){
     glob.__rpcPartialData = {};
 
     glob[PROCESS_EVENT_PARTIAL] = (player: Player | string | number, id: number, index: number, size: number | string, rawData?: string) => {
-        if(environment === "unknown") throw "Unknown RAGE environment";
+        if(environment === "unknown") {
+            return;
+        }
 
         if(environment !== "server"){
             rawData = size as string;
@@ -50,7 +52,9 @@ if(!glob[PROCESS_EVENT]){
     glob.__rpcEvListeners = {};
 
     glob[PROCESS_EVENT] = (player: Player | string, rawData?: string) => {
-        if(environment === "unknown") throw "Unknown RAGE environment";
+        if(environment === "unknown") {
+            return;
+        }
 
         if(environment !== "server") rawData = player as string;
         const data: Event = util.parseData(rawData);
@@ -153,16 +157,16 @@ if(!glob[PROCESS_EVENT]){
             });
         }
     }else{
-        if(environment === "unknown") throw "Unknown RAGE environment";
-
-        if(typeof glob[IDENTIFIER] === 'undefined'){
-            glob[IDENTIFIER] = new Promise(resolve => {
-                if (window.name) {
-                    resolve(window.name);
-                }else{
-                    glob[IDENTIFIER+':resolve'] = resolve;
-                }
-            });
+        if(environment !== "unknown") {
+            if(typeof glob[IDENTIFIER] === 'undefined'){
+                glob[IDENTIFIER] = new Promise(resolve => {
+                    if (window.name) {
+                        resolve(window.name);
+                    }else{
+                        glob[IDENTIFIER+':resolve'] = resolve;
+                    }
+                });
+            }
         }
     }
 
